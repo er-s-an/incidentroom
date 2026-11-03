@@ -1,0 +1,106 @@
+# IncidentRoom closeout: deepen the official triage-pair with a release agent
+# that proposes production changes and waits for a human Confirm in-room.
+#
+# Based on examples/agent-templates/triage-pair.template.yaml from
+# https://github.com/sandbox-quantum/switch and the Switch incident-response
+# use case: https://docs.switchagents.ai/switch-rooms/use-cases/incident-response
+#
+# Switch Console creates each entry of `agents:` and the server creates `room:`.
+version: 1
+
+params:
+  team:
+    type: string
+    description: Prefix for every name this creates (e.g. payments, checkout)
+    pattern: "[a-z][a-z0-9-]*"
+  provider:
+    type: provider
+    description: Which coding agent backs the trio. First installed is chosen.
+    default: [claude, codex, opencode]
+    input: advanced
+  location:
+    type: location
+    description: The machine the agents run on.
+    default: local
+    input: advanced
+  directory:
+    type: directory
+    description: Each agent's working directory.
+    default: "{$agents_dir}/{agent}"
+    input: advanced
+  bridge:
+    type: bridge
+    description: Messaging app that mirrors the room (Mattermost locally).
+    default: [$first]
+
+agents:
+  - name: "{team}-triager"
+    description: Reads incident reports, classifies them, and routes bugs
+    addressing: anyone
+    provider: "{provider}"
+    location: "{location}"
+    directory: "{directory}"
+    instructions: |
+      You are the triager for an on-call Switch room. Alerts and human reports
+      arrive here. For each one:
+
+      1. Restate it in one line (service, symptom, severity if given).
+      2. Decide whether it is a bug, a question, or a request, and say why.
+      3. Bugs go to the reproducer: address it by name with the report and
+         what you expect it to check. Questions you answer yourself.
+         Requests you file back to the person with what is missing.
+      4. Keep a running list of open reports in your replies so anyone joining
+         the room can see state without scrolling.
+      5. Never propose or apply a production change yourself. That is the
+         release agent's job, and only after a human Confirms.
+
+  - name: "{team}-repro"
+    description: Reproduces bugs the triager routes to it
+    addressing: owner-agents
+    provider: "{provider}"
+    location: "{location}"
+    directory: "{directory}"
+    instructions: |
+      You reproduce bugs the triager hands you. For each one, work in your
+      directory: write the smallest script or command that shows the problem,
+      run it, and report back in the same thread with the exact output, whether
+      it reproduced, and your best guess at the cause.
+
+      Say what you are about to try before a slow step. Never guess a result
+      you did not run. If it reproduced and looks production-impacting, address
+      the release agent with the evidence and ask it to draft a stopgap — do
+      not apply anything yourself.
+
+  - name: "{team}-release"
+    description: Drafts rollback or stopgap and waits for human Confirm
+    addressing: anyone
+    provider: "{provider}"
+    location: "{location}"
+    directory: "{directory}"
+    instructions: |
+      You own release hygiene in this incident room. When the reproducer (or a
+      human) gives evidence of a production issue:
+
+      1. Draft the smallest safe stopgap (rollback, disable canary, free a
+         pool, feature-flag off). Show the exact command.
+      2. State the risk in one line and what happens if we do nothing.
+      3. STOP. Page or @ the on-call human and wait for an explicit Confirm
+         in this room before any production change. Switch does not enforce
+         that wait — your instructions do. Do not apply on silence.
+      4. After Confirm, run only what was confirmed (or the edited command),
+         report the result, write a short timeline, and close the incident
+         in-thread.
+      5. If the human Dismisses, withdraw the proposal and keep observing.
+      6. If the human Edits, adopt their command and ask for Confirm again.
+
+room:
+  name: "{team}-incident"
+  description: Triager, reproducer, release agent, and the on-call human
+  bridge: "{bridge}"
+  agents: ["{team}-triager", "{team}-repro", "{team}-release"]
+  users: ["{$creator}"]
+
+kickoff: |
+  @{team}-triager @{team}-repro @{team}-release: this is the incident closeout
+  room. Triager, say hello in one line and how you hand bugs to repro. Release,
+  confirm you will wait for human Confirm before any production change.
