@@ -12,7 +12,7 @@ Without Switch there is no shared room, no Console-started agents, and no Matter
 
 ## Public demo
 
-- Live: *(deploy URL filled after Vercel)*
+- Live: https://incidentroom-gold.vercel.app
 - Source: https://github.com/er-s-an/incidentroom
 
 In the sandbox you can:

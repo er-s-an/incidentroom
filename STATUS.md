@@ -27,7 +27,7 @@ Switch is central (YAML room + Console/Mattermost path in README); public web de
 - Live thing: change severity/service/log/agents/sensitivity → sandbox recomputes; Confirm/Edit/Dismiss update state
 
 ## Deliverables
-- [x] Public demo (Vercel) — deploying
+- [x] Public demo https://incidentroom-gold.vercel.app (HTTP 200)
 - [x] GitHub `er-s-an/incidentroom`
 - [ ] English Remotion explainer ~160–200s → review-clips (script done; render next)
 - [x] STATUS Skills line kept current
