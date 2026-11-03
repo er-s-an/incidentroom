@@ -2,84 +2,133 @@ export type Severity = "SEV1" | "SEV2" | "SEV3";
 export type Service = "checkout" | "auth" | "payments" | "search";
 export type Sensitivity = "low" | "med" | "high";
 export type AgentId = "triager" | "reproducer" | "release";
-export type PanelTab = "history" | "rules" | "tasks" | "decisions";
-export type DecisionAction = "confirm" | "edit" | "dismiss";
-export type IncidentStatus = "open" | "awaiting" | "closed" | "dismissed";
+export type ActorId = "human" | AgentId | "system";
+export type Resolution = "open" | "confirmed" | "dismissed";
+export type TaskStatus = "queued" | "running" | "done" | "blocked" | "skipped";
+export type DecisionStatus = "pending" | "confirmed" | "dismissed" | "superseded";
+export type IncidentStatus = "open" | "pending" | "closed" | "dismissed" | "blocked";
 
-export type Member = {
-  id: string;
-  name: string;
-  role: "human" | "agent";
-  agentId?: AgentId;
-  status: "online" | "busy" | "away";
-  initials: string;
-};
+export interface AgentFlags {
+  triager: boolean;
+  reproducer: boolean;
+  release: boolean;
+}
 
-export type Message = {
-  id: string;
-  authorId: string;
-  authorName: string;
-  kind: "human" | "agent" | "system";
-  body: string;
-  at: string;
-  mentions?: string[];
-};
-
-export type TaskItem = {
-  id: string;
-  title: string;
-  owner: string;
-  status: "todo" | "doing" | "done" | "blocked";
-};
-
-export type DecisionItem = {
-  id: string;
-  title: string;
-  proposedBy: string;
-  action: string;
-  status: "pending" | "confirmed" | "edited" | "dismissed";
-  detail?: string;
-};
-
-export type HistoryItem = {
-  id: string;
-  at: string;
-  label: string;
-};
-
-export type SandboxInputs = {
+export interface SandboxInputs {
   severity: Severity;
   service: Service;
   logSnippet: string;
-  agents: Record<AgentId, boolean>;
+  agents: AgentFlags;
   sensitivity: Sensitivity;
-  presetId: string;
-};
+  resolution: Resolution;
+  editedAction?: string;
+  dismissedActionId?: string;
+}
 
-export type ProposedAction = {
+export interface Message {
+  id: string;
+  actor: ActorId;
+  name: string;
+  handle: string;
+  body: string;
+  at: string;
+  kind: "chat" | "system" | "decision" | "code";
+  delayMs: number;
+}
+
+export interface Task {
   id: string;
   title: string;
-  command: string;
-  risk: string;
-  rationale: string;
-};
+  owner: ActorId;
+  status: TaskStatus;
+  note: string;
+}
 
-export type SandboxState = {
-  inputs: SandboxInputs;
-  members: Member[];
-  messages: Message[];
-  tasks: TaskItem[];
-  decisions: DecisionItem[];
-  history: HistoryItem[];
-  proposed: ProposedAction | null;
+export interface Decision {
+  id: string;
+  title: string;
+  body: string;
+  status: DecisionStatus;
+  actor: ActorId;
+}
+
+export interface HistoryEvent {
+  id: string;
+  at: string;
+  label: string;
+  detail: string;
+}
+
+export interface ProposedAction {
+  id: string;
+  title: string;
+  summary: string;
+  target: string;
+  command: string;
+  waitForHuman: boolean;
+  risk: string;
+  kind: "rollback" | "canary-pause" | "flag" | "watch";
+}
+
+export interface Member {
+  id: ActorId;
+  name: string;
+  handle: string;
+  role: string;
+  online: boolean;
+  initials: string;
+}
+
+export interface Rule {
+  name: string;
+  body: string;
+}
+
+export interface ScorePart {
+  label: string;
+  points: number;
+}
+
+export interface LogSignals {
+  statuses: number[];
+  latencies: number[];
+  shas: string[];
+  versions: string[];
+  hasTimeout: boolean;
+  hasPanic: boolean;
+  hasOom: boolean;
+  errorRate: number | null;
+  excerpt: string;
+  empty: boolean;
+}
+
+export interface SandboxResult {
+  incidentId: string;
+  roomName: string;
+  team: string;
   status: IncidentStatus;
   severityScore: number;
-  editedCommand: string | null;
-  runId: number;
-};
+  scoreBreakdown: ScorePart[];
+  messages: Message[];
+  tasks: Task[];
+  decisions: Decision[];
+  history: HistoryEvent[];
+  proposedAction: ProposedAction | null;
+  members: Member[];
+  rules: Rule[];
+  summary: string;
+  signals: LogSignals;
+  pageHuman: boolean;
+  clock: string;
+}
 
-export type Preset = {
+export interface Preset {
   id: string;
-  label: string;
-  seed: Omit<SandboxInputs, "presetId">;
-};
+  name: string;
+  blurb: string;
+  severity: Severity;
+  service: Service;
+  logSnippet: string;
+  agents: AgentFlags;
+  sensitivity: Sensitivity;
+}

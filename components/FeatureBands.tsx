@@ -1,70 +1,91 @@
 "use client";
 
-import { useState } from "react";
+import type { AgentFlags, SandboxResult, Sensitivity } from "@/lib/sandbox/types";
 
-const BANDS = [
-  {
-    id: "route",
-    sentence: "Route the report before anyone scrolls.",
-    on: "Triager keeps open reports in every reply.",
-    off: "Without routing, the thread becomes archaeology.",
-    start: true,
-  },
-  {
-    id: "repro",
-    sentence: "Reproduce with output, never a guess.",
-    on: "Repro agent posts the command and exact result.",
-    off: "Guesses do not earn a production change.",
-    start: true,
-  },
-  {
-    id: "gate",
-    sentence: "Gate every deploy behind Confirm.",
-    on: "Release waits. Your name sits on the decision.",
-    off: "Autonomous rollback is out of scope here.",
-    start: false,
-  },
-  {
-    id: "shift",
-    sentence: "Hand the whole thread to the next shift.",
-    on: "History, tasks, and decisions stay in-room.",
-    off: "Handoffs die when context lives in five tools.",
-    start: false,
-  },
+interface Band {
+  id: "triager" | "reproducer" | "release" | "sensitivity";
+  sentence: string;
+  tone: "accent" | "ink";
+}
+
+const BANDS: Band[] = [
+  { id: "triager", sentence: "Triager reads the report and routes it.", tone: "accent" },
+  { id: "reproducer", sentence: "Reproducer runs the failing path itself.", tone: "ink" },
+  { id: "release", sentence: "Release waits for a person before production.", tone: "accent" },
+  { id: "sensitivity", sentence: "High sensitivity pages and rolls back sooner.", tone: "ink" },
 ];
 
-export default function FeatureBands() {
-  const [on, setOn] = useState<Record<string, boolean>>(
-    Object.fromEntries(BANDS.map((b) => [b.id, b.start]))
-  );
+export function FeatureBands({
+  agents,
+  sensitivity,
+  result,
+  onAgents,
+  onSensitivity,
+}: {
+  agents: AgentFlags;
+  sensitivity: Sensitivity;
+  result: SandboxResult;
+  onAgents: (next: AgentFlags) => void;
+  onSensitivity: (next: Sensitivity) => void;
+}) {
+  const on = {
+    triager: agents.triager,
+    reproducer: agents.reproducer,
+    release: agents.release,
+    sensitivity: sensitivity === "high",
+  };
+
+  const consequence = {
+    triager: agents.triager
+      ? `Routes in one message. Open reports listed as ${result.incidentId}.`
+      : "The report sits unrouted.",
+    reproducer: agents.reproducer
+      ? result.signals.empty
+        ? "Online, but it will not invent output without a log."
+        : `Posts exact output for ${result.roomName}.`
+      : "Skipped. Any rollback is log-only.",
+    release: agents.release
+      ? result.proposedAction
+        ? `${result.proposedAction.title}. Confirm still waits.`
+        : "Online, with nothing to propose yet."
+      : "Nobody drafts a rollback.",
+    sensitivity:
+      sensitivity === "high"
+        ? `Score ${result.severityScore}. ${result.pageHuman ? "Pages now." : "Still under the page line."}`
+        : `Score ${result.severityScore} at ${sensitivity} sensitivity.`,
+  };
+
+  const toggle = (id: Band["id"]) => {
+    if (id === "sensitivity") {
+      onSensitivity(sensitivity === "high" ? "med" : "high");
+      return;
+    }
+    onAgents({ ...agents, [id]: !agents[id] });
+  };
 
   return (
-    <section className="bands" aria-label="What IncidentRoom keeps">
-      {BANDS.map((b) => {
-        const active = on[b.id];
+    <section className="bands" id="features" aria-label="What the room does">
+      {BANDS.map((band) => {
+        const checked = on[band.id];
         return (
-          <div key={b.id} className={`band ${active ? "on" : ""}`}>
-            <div className="band-text">
-              <p>{b.sentence}</p>
-              {active ? <small>{b.on}</small> : <small>{b.off}</small>}
+          <div
+            key={band.id}
+            className={checked ? `band on tone-${band.tone}` : "band"}
+            data-reveal=""
+          >
+            <div className="band-copy">
+              <p>{band.sentence}</p>
+              {checked ? <p className="consequence">{consequence[band.id]}</p> : null}
             </div>
-            <div className="band-switch">
-              <button
-                type="button"
-                className="switch"
-                role="switch"
-                aria-checked={active}
-                aria-label={b.sentence}
-                data-ui
-                onClick={() => setOn((s) => ({ ...s, [b.id]: !s[b.id] }))}
-                onKeyDown={(e) => {
-                  if (e.key === " " || e.key === "Enter") {
-                    e.preventDefault();
-                    setOn((s) => ({ ...s, [b.id]: !s[b.id] }));
-                  }
-                }}
-              />
-            </div>
+            <button
+              type="button"
+              className="switch"
+              role="switch"
+              aria-checked={checked}
+              aria-label={band.sentence}
+              data-ui
+              onClick={() => toggle(band.id)}
+            />
           </div>
         );
       })}

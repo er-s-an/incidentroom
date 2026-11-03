@@ -1,12 +1,13 @@
-export default function Cta() {
+export function Cta() {
   return (
-    <section className="cta" id="cta">
-      <h2>Keep the pause</h2>
-      <div className="cta-bottom">
-        <p>
-          Agents prepare the rollback. You Confirm it in the same Switch room
-          the alert arrived in.
-        </p>
+    <section className="cta" aria-labelledby="cta-title">
+      <h2 id="cta-title">
+        INCIDENT
+        <br />
+        CLOSED
+      </h2>
+      <div className="cta-foot">
+        <p>Run the room with a 500, a timeout, or a latency canary. Confirm still waits.</p>
         <a className="btn" href="#sandbox">
           Open sandbox
         </a>

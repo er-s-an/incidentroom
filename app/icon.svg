@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" fill="#ebe5e3"/>
-  <rect y="32" width="64" height="32" fill="#0f7d45"/>
-  <text x="32" y="38" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-weight="700" fill="#2b2622">IR</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="16" fill="#ebe5e3"/>
+  <rect y="16" width="32" height="16" fill="#0f7d45"/>
+  <rect x="6" y="10" width="20" height="4" fill="#2b2622"/>
+  <rect x="6" y="18" width="14" height="4" fill="#ffffff"/>
 </svg>

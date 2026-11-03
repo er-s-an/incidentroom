@@ -1,36 +1,51 @@
-export default function Hero() {
+export function Hero() {
   return (
     <header className="hero">
-      <div className="hero-top">
-        <div className="hero-nav">
-          <div className="wordmark">IncidentRoom</div>
-          <a className="btn" href="#sandbox">
-            Open sandbox
-          </a>
+      <div className="hero-field-top" />
+      <div className="hero-field-bot" />
+      <nav className="hero-nav">
+        <a className="wordmark" href="#content">
+          IncidentRoom
+        </a>
+        <a className="btn" href="#sandbox">
+          Open sandbox
+        </a>
+      </nav>
+      <div className="hero-copy dry">
+        <div className="hero-headline">
+          <h1 className="lines">
+            <span className="line">
+              <span data-line="" style={{ ["--i" as string]: 0 }}>
+                CLOSE IT
+              </span>
+            </span>
+            <span className="line">
+              <span data-line="" style={{ ["--i" as string]: 1 }}>
+                IN CHAT
+              </span>
+            </span>
+          </h1>
         </div>
       </div>
-      <div className="hero-bottom">
-        <p className="hero-copy">
-          On-call closeout teammates in Switch chat. Triage, reproduce, propose
-          rollback — nothing ships until a human Confirms.
-        </p>
+      <div className="hero-copy wet" aria-hidden="true">
+        <div className="hero-headline">
+          <h1 className="lines">
+            <span className="line">
+              <span data-line="" style={{ ["--i" as string]: 0 }}>
+                CLOSE IT
+              </span>
+            </span>
+            <span className="line">
+              <span data-line="" style={{ ["--i" as string]: 1 }}>
+                IN CHAT
+              </span>
+            </span>
+          </h1>
+        </div>
       </div>
-      <h1 className="hero-headline hero-clip-light" aria-hidden="true">
-        <span>
-          <span className="line">CLOSE IT</span>
-        </span>
-        <span>
-          <span className="line">IN CHAT</span>
-        </span>
-      </h1>
-      <h1 className="hero-headline hero-clip-dark">
-        <span>
-          <span className="line">CLOSE IT</span>
-        </span>
-        <span>
-          <span className="line">IN CHAT</span>
-        </span>
-      </h1>
+      <p className="hero-support">
+        On-call closeout lives in the Switch room. Confirm is the only production gate.
+      </p>
     </header>
   );
 }

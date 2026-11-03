@@ -2,7 +2,7 @@
   "name": "incidentroom",
   "version": "1.0.0",
   "private": true,
-  "description": "On-call incident closeout in team chat via Switch.",
+  "description": "On-call incident closeout in a Switch room. Confirm is the only production gate.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

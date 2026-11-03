@@ -1,49 +1,59 @@
-export default function HowItWorks() {
+export function HowItWorks() {
   return (
-    <section className="section how-wrap" id="how">
-      <div className="grid-12">
-        <div>
-          <h2 className="how-title">From alert to Confirm</h2>
-          <p className="how-copy">
-            Switch keeps the whole incident in one room. Agents move the work;
-            a person owns the production change.
+    <section className="how" id="how" data-reveal="">
+      <div className="how-grid">
+        <div className="how-copy">
+          <h2>Close in chat</h2>
+          <p>
+            A checkout 500 is a Switch room, not a ticket pile. Three agents share the thread with
+            the on-call. Production waits on a named Confirm.
           </p>
         </div>
-        <div className="slip" aria-label="Closeout itinerary">
-          <h3>Report</h3>
-          <div className="slip-row">
-            <span>Human posts checkout 500</span>
-            <span className="dots" aria-hidden />
-            <span>0:20</span>
+        <article className="slip" aria-label="Closeout itinerary">
+          <div className="slip-group">
+            <h3>Minute 0</h3>
+            <div className="itin-row">
+              <span>Report in the room</span>
+              <span className="leader" />
+              <span className="when">12s</span>
+            </div>
+            <div className="itin-row">
+              <span>Triager restates</span>
+              <span className="leader" />
+              <span className="when">20s</span>
+            </div>
           </div>
-          <h3>Triage</h3>
-          <div className="slip-row">
-            <span>inc-triager classifies and routes</span>
-            <span className="dots" aria-hidden />
-            <span>1:00</span>
+          <div className="slip-group">
+            <h3>Minute 2</h3>
+            <div className="itin-row">
+              <span>Reproducer runs the path</span>
+              <span className="leader" />
+              <span className="when">1m</span>
+            </div>
+            <div className="itin-row">
+              <span>Evidence in the thread</span>
+              <span className="leader" />
+              <span className="when">40s</span>
+            </div>
           </div>
-          <div className="slip-row">
-            <span>Open reports stay in the reply</span>
-            <span className="dots" aria-hidden />
-            <span>—</span>
+          <div className="slip-group">
+            <h3>Minute 6</h3>
+            <div className="itin-row">
+              <span>Release proposes rollback</span>
+              <span className="leader" />
+              <span className="when">30s</span>
+            </div>
+            <div className="itin-row">
+              <span>Confirm, Edit, or Dismiss</span>
+              <span className="leader" />
+              <span className="when">wait</span>
+            </div>
           </div>
-          <h3>Reproduce</h3>
-          <div className="slip-row">
-            <span>inc-repro runs the smallest check</span>
-            <span className="dots" aria-hidden />
-            <span>3:00</span>
-          </div>
-          <h3>Propose</h3>
-          <div className="slip-row">
-            <span>inc-release drafts rollback</span>
-            <span className="dots" aria-hidden />
-            <span>4:00</span>
-          </div>
-          <div className="slip-total">
-            <span>Human Confirm · incident closed</span>
-            <span>~5 min</span>
-          </div>
-        </div>
+          <p className="slip-end">
+            <span>Incident closed in the same thread</span>
+            <span>8 min</span>
+          </p>
+        </article>
       </div>
     </section>
   );
